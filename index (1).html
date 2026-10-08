@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PESTLE & Organizational Environment Quiz</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh; display:flex; justify-content:center; align-items:center;
+  background:linear-gradient(135deg,#6c5ce7,#00cec9,#fd79a8);
+  background-size:300% 300%; animation:bg 10s ease infinite; color:#222;
+}
+@keyframes bg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.game{
+  width:min(920px,94vw); background:rgba(255,255,255,.96); border-radius:28px;
+  padding:28px; box-shadow:0 18px 60px rgba(0,0,0,.25); position:relative; overflow:hidden;
+}
+.header{display:flex; justify-content:space-between; gap:15px; align-items:center; flex-wrap:wrap}
+.title{font-size:clamp(24px,4vw,38px); font-weight:900; color:#5f27cd}
+.subtitle{color:#666;margin-top:5px}
+.badges{display:flex;gap:10px}
+.badge{padding:10px 15px;border-radius:999px;font-weight:800;color:white}
+.score{background:#ff9f43}.qnum{background:#00b894}
+.progress{height:12px;background:#eee;border-radius:99px;margin:22px 0;overflow:hidden}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#ff7675,#fdcb6e,#00cec9);transition:.4s}
+.question{font-size:21px;line-height:1.5;font-weight:800;margin:12px 0 20px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.option{
+  border:3px solid #e8e8e8;background:white;border-radius:17px;padding:16px;
+  font-size:17px;font-weight:700;text-align:left;cursor:pointer;transition:.2s;
+}
+.option:hover:not(:disabled){transform:translateY(-3px);border-color:#a29bfe;background:#f7f5ff}
+.option.correct{background:#dff9e9;border-color:#00b894;color:#087f5b}
+.option.wrong{background:#ffe5e5;border-color:#ff7675;color:#c0392b}
+.option:disabled{cursor:default}
+.feedback{
+  min-height:60px;margin-top:18px;border-radius:16px;padding:14px 18px;
+  display:flex;align-items:center;font-weight:800;font-size:18px;opacity:0;transition:.25s;
+}
+.feedback.show{opacity:1}
+.feedback.good{background:#dff9e9;color:#087f5b}
+.feedback.bad{background:#fff0f0;color:#c0392b}
+.next{
+  display:none;margin:18px auto 0;border:0;border-radius:999px;padding:14px 30px;
+  background:#5f27cd;color:white;font-size:17px;font-weight:900;cursor:pointer;
+  box-shadow:0 7px 18px rgba(95,39,205,.3)
+}
+.next.show{display:block}.next:hover{transform:scale(1.03)}
+.start,.result{text-align:center}
+.start h1{font-size:42px;color:#5f27cd;margin:10px 0}
+.start p{font-size:18px;color:#555;line-height:1.6}
+.start button,.restart{
+  border:0;border-radius:999px;padding:16px 34px;background:linear-gradient(90deg,#5f27cd,#e84393);
+  color:white;font-size:19px;font-weight:900;cursor:pointer;margin-top:15px;
+}
+.hidden{display:none}
+.big-score{font-size:72px;font-weight:1000;color:#5f27cd}
+.result h2{font-size:30px}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;width:10px;height:18px;animation:fall 1.4s linear forwards}
+@keyframes fall{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(700px) rotate(720deg);opacity:0}}
+@media(max-width:650px){.options{grid-template-columns:1fr}.game{padding:20px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="game">
+  <div id="confetti" class="confetti"></div>
+
+  <section id="start" class="start">
+    <div style="font-size:65px">🎯✨📚</div>
+    <h1>PESTLE & Organizational Environment Quiz</h1>
+    <p>10 multiple-choice questions • Test your management knowledge!</p>
+    <p><b>Choose the best answer and have fun! 🚀</b></p>
+    <button onclick="startGame()">START QUIZ ▶</button>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="header">
+      <div>
+        <div class="title">🌈 Management Challenge</div>
+        <div class="subtitle">PESTLE • Organizational Environment • Corporate Culture</div>
+      </div>
+      <div class="badges">
+        <div class="badge qnum" id="qBadge">1 / 10</div>
+        <div class="badge score">⭐ <span id="score">0</span></div>
+      </div>
+    </div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div id="question" class="question"></div>
+    <div id="options" class="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <button id="next" class="next" onclick="nextQuestion()">NEXT QUESTION ➜</button>
+  </section>
+
+  <section id="result" class="result hidden">
+    <div style="font-size:70px" id="resultEmoji">🏆</div>
+    <h2 id="resultTitle">Amazing!</h2>
+    <div class="big-score"><span id="finalScore">0</span>/10</div>
+    <p id="resultText" style="font-size:19px;color:#555"></p>
+    <button class="restart" onclick="restartGame()">PLAY AGAIN 🔄</button>
+  </section>
+</div>
+
+<script>
+const questions = [
+{q:"The South Korean government introduces a new policy to support the global expansion of K-pop and Korean entertainment companies. HYBE receives additional support for international cultural promotion. Which PESTLE factor is affecting HYBE?",
+a:["Economic","Social","Political","Technological"],c:2},
+{q:"Olive Young uses AI technology to analyze customers’ skin through a smartphone camera and recommend suitable skincare products. Which factor is this?",
+a:["Sociocultural","Economic","Technological","International"],c:2},
+{q:"Netflix is doing very well in the market. However, as high-speed Internet develops, consumers are shifting from traditional TV to watching movies online. Which factor in PESTLE does this represent?",
+a:["Political","Economic","Social","Technological"],c:3},
+{q:"What does “organizational environment” refer to?",
+a:["Only internal factors","Only competitors","All internal and external factors that affect an organization’s activities, decisions, and performance","Only factors that the organization can control"],c:2},
+{q:"Which of the following is part of the Task Environment?",
+a:["Inflation","Customers","Government tax policies","Cultural changes"],c:1},
+{q:"A country changes its labor laws, requiring a company to adjust its employee policies. Which dimension does this belong to?",
+a:["Technological dimension","Sociocultural dimension","Legal–Political dimension","Natural dimension"],c:2},
+{q:"Starbucks changes its drinks to match the tastes of consumers in different countries. Which dimension does this best represent?",
+a:["Economic dimension","Sociocultural dimension","Technological dimension","International dimension"],c:1},
+{q:"Tesla uses AI and autonomous-driving technology to improve its products and develop new ones. Which dimension is this an example of?",
+a:["Technological dimension","Natural dimension","Legal–Political dimension","Economic dimension"],c:0},
+{q:"Why do organizations care about the environment?",
+a:["Because organizations can completely control the environment","Because environmental changes create uncertainty, opportunities, and threats","Because the environment only creates opportunities","Because the environment does not affect strategy"],c:1},
+{q:"Shopee analyzes daily shopping data to identify trends and launch suitable promotions. Which strategy does this represent?",
+a:["Influence the Environment","Business Intelligence","Corporate Culture","Toxic Culture"],c:1},
+{q:"Nike uses the slogan “Just Do It” to express its core corporate values. Which element of corporate culture is this?",
+a:["Symbols","Stories","Heroes","Slogans"],c:3}
+];
+
+let index=0, score=0, answered=false;
+let audioCtx;
+
+function startAudio(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}
+function tone(freq,dur,type="sine",vol=.08,delay=0){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0,audioCtx.currentTime+delay);
+  g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+delay+.02);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+delay+dur);
+  o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+delay);o.stop(audioCtx.currentTime+delay+dur+.03);
+}
+function correctSound(){tone(523,.16,"sine",.1);tone(659,.16,"sine",.1,.12);tone(784,.28,"sine",.1,.24)}
+function wrongSound(){tone(220,.2,"triangle",.08);tone(180,.3,"triangle",.07,.18)}
+
+function startGame(){
+  startAudio(); index=0;score=0;
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  render();
+}
+function render(){
+  answered=false;
+  const x=questions[index];
+  document.getElementById("qBadge").textContent=`${index+1} / ${questions.length}`;
+  document.getElementById("score").textContent=score;
+  document.getElementById("bar").style.width=`${(index/questions.length)*100}%`;
+  document.getElementById("question").textContent=`${index+1}. ${x.q}`;
+  const box=document.getElementById("options");box.innerHTML="";
+  x.a.forEach((ans,i)=>{
+    const b=document.createElement("button");b.className="option";
+    b.textContent=`${String.fromCharCode(65+i)}. ${ans}`;
+    b.onclick=()=>answer(i);box.appendChild(b);
+  });
+  const f=document.getElementById("feedback");f.className="feedback";f.textContent="";
+  document.getElementById("next").className="next";
+}
+function answer(choice){
+  if(answered)return;answered=true;
+  const x=questions[index], buttons=[...document.querySelectorAll(".option")];
+  buttons.forEach(b=>b.disabled=true);
+  buttons[x.c].classList.add("correct");
+  const f=document.getElementById("feedback");
+  if(choice===x.c){
+    score++;document.getElementById("score").textContent=score;
+    f.textContent="🎉 Correct! Great job — you got it!";
+    f.className="feedback show good";correctSound();confetti();
+  }else{
+    buttons[choice].classList.add("wrong");
+    f.textContent=`💛 Not quite! The correct answer is ${String.fromCharCode(65+x.c)}. ${x.a[x.c]}. Keep going!`;
+    f.className="feedback show bad";wrongSound();
+  }
+  document.getElementById("bar").style.width=`${((index+1)/questions.length)*100}%`;
+  document.getElementById("next").className="next show";
+}
+function nextQuestion(){
+  index++;
+  if(index>=questions.length)showResult(); else render();
+}
+function confetti(){
+  const box=document.getElementById("confetti");box.innerHTML="";
+  for(let i=0;i<35;i++){
+    const s=document.createElement("i");
+    s.style.left=Math.random()*100+"%";
+    s.style.top="-20px";
+    s.style.background=["#ff7675","#fdcb6e","#00cec9","#6c5ce7","#e84393"][Math.floor(Math.random()*5)];
+    s.style.transform=`rotate(${Math.random()*360}deg)`;
+    s.style.animationDelay=Math.random()*.3+"s";
+    box.appendChild(s);
+  }
+  setTimeout(()=>box.innerHTML="",1800);
+}
+function showResult(){
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("finalScore").textContent=score;
+  let title,text,emoji;
+  if(score===11){emoji="👑";title="PERFECT!";text="Outstanding! You mastered the whole quiz!";}
+  else if(score>=9){emoji="🏆";title="AMAZING!";text="Excellent work! Your management knowledge is strong!";}
+  else if(score>=7){emoji="🌟";title="GREAT JOB!";text="Very good! A little more practice and you’ll be unstoppable!";}
+  else if(score>=5){emoji="💪";title="KEEP GOING!";text="Nice effort! Review the key concepts and try again!";}
+  else {emoji="🌱";title="GOOD TRY!";text="Don’t worry! Every mistake is a chance to learn. Try again!";}
+  document.getElementById("resultEmoji").textContent=emoji;
+  document.getElementById("resultTitle").textContent=title;
+  document.getElementById("resultText").textContent=text;
+  if(score>=7){correctSound();setTimeout(confetti,250)}
+}
+function restartGame(){startGame()}
+</script>
+</body>
+</html>
